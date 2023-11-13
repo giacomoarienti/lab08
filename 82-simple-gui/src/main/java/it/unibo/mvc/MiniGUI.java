@@ -1,8 +1,11 @@
 package it.unibo.mvc;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -30,16 +33,30 @@ public class MiniGUI {
         final JPanel canvas = new JPanel();
         canvas.setLayout(new BorderLayout());
         final JButton write = new JButton("Print a random number on standard output");
-        canvas.add(write, BorderLayout.CENTER);
         frame.setContentPane(canvas);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // 1. Create a new `JPanel`
+        final JPanel panel = new JPanel();
+        // 2. Use an horizontal `BoxLayout` as layout
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        // 3. Set the new `JPanel` as the only content of the center of the previously existing `BorderLayout`
+        canvas.add(panel);
+        // 4. Add the `JButton` to the new panel
+        panel.add(write);
+        // 1. Create a new text field labeled "Result"
+        final JTextField field = new JTextField("Result");
+        // 2. Add it to the external `JPanel` in such a way that it gets on the top of the frame (`Borderlayout.NORTH`)
+        canvas.add(field, BorderLayout.NORTH);
         /*
          * Handlers
          */
         write.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(final ActionEvent e) {
-                System.out.println(randomGenerator.nextInt());
+                final int rand = randomGenerator.nextInt();
+                System.out.println(rand);
+                // 1. Modify the application in such a way that the text field displays the same number that gets printed
+                field.setText(String.valueOf(rand));
             }
         });
     }
@@ -67,6 +84,7 @@ public class MiniGUI {
         /*
          * Resize the frame to minimum size
          */
+        // 6. In `display()`, use `JFrame.pack()` to resize the frame to the minimum size prior to displaying
         frame.pack();
         /*
          * OK, ready to pull the frame onscreen
