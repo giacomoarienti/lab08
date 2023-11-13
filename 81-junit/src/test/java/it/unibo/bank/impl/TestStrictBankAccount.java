@@ -35,10 +35,13 @@ public class TestStrictBankAccount {
     // 3. Perform a deposit of 100€, compute the management fees, and check that the balance is correctly reduced.
     @Test
     public void testManagementFees() {
-        this.bankAccount.deposit(this.mRossi.getUserID(), 100);
+        this.bankAccount.deposit(this.mRossi.getUserID(), INITIAL_AMOUNT);
+        assertEquals(this.bankAccount.getBalance(), INITIAL_AMOUNT + INITIAL_AMOUNT);
         final double initialBalance = this.bankAccount.getBalance();
         final double feeAmount = MANAGEMENT_FEE + this.bankAccount.getTransactionsCount() * TRANSACTION_FEE;
+        assertTrue(this.bankAccount.getTransactionsCount() > 0);
         this.bankAccount.chargeManagementFees(this.mRossi.getUserID());
+        assertEquals(0, this.bankAccount.getTransactionsCount());
         assertEquals(initialBalance - feeAmount, this.bankAccount.getBalance());
     }
 
@@ -47,9 +50,9 @@ public class TestStrictBankAccount {
     public void testNegativeWithdraw() {
         try {
             this.bankAccount.withdraw(this.mRossi.getUserID(), -this.bankAccount.getBalance());
-            fail();
-        } catch (IllegalArgumentException e) {
-
+            fail("Negative withdraws have been allowed");
+        } catch (final IllegalArgumentException e) {
+            assertEquals("Cannot withdraw a negative amount", e.getMessage());
         }
     }
 
@@ -58,8 +61,9 @@ public class TestStrictBankAccount {
     public void testWithdrawingTooMuch() {
         try {
             this.bankAccount.withdraw(this.mRossi.getUserID(), this.bankAccount.getBalance() + 1);
-            fail();
-        } catch (IllegalArgumentException e) {
+            fail("Withdraw amount greater than balance have been allowed");
+        } catch (final IllegalArgumentException e) {
+            assertEquals("Insufficient balance", e.getMessage());
         }
     }
 }
